@@ -1,0 +1,108 @@
+/*
+=====================================================================================
+Load Bronze Layer (Source -> Bronze)
+=====================================================================================
+Script Purpose:
+Note: Run this as a script, not as a stored procedure (due to MySQL limitations).
+    This script loads data into the 'bronze' schema from external CSV files.
+    It performs the following actions:
+    -Truncates the bronze tables before loading data.
+    -Uses the `LOAD DATA` command to load data from csv files to bronze tables.
+
+Parameters:
+    None.
+  This script does not accept any parameters or return any values.
+
+Usage Example:
+  Verification Query: 
+  Checking row counts for all CRM and ERP tables
+
+    SELECT 'crm_cust_info' AS table_name, COUNT(*) AS row_cnt FROM dwh_bronze.crm_cust_info
+    UNION ALL
+    SELECT 'crm_prd_info', COUNT(*) FROM dwh_bronze.crm_prd_info
+    UNION ALL
+    SELECT 'crm_sales_details', COUNT(*) FROM dwh_bronze.crm_sales_details
+    UNION ALL
+    SELECT 'erp_cust_az12', COUNT(*) FROM dwh_bronze.erp_cust_az12
+    UNION ALL
+    SELECT 'erp_loc_a101', COUNT(*) FROM dwh_bronze.erp_loc_a101
+    UNION ALL
+    SELECT 'erp_px_cat_g1v2', COUNT(*) FROM dwh_bronze.erp_px_cat_g1v2;
+*/
+
+-- 1. Setup Environment
+SET GLOBAL local_infile = 1;
+SET UNIQUE_CHECKS = 0;          -- Speeds up import
+SET FOREIGN_KEY_CHECKS = 0;     -- Speeds up import
+
+-- -----------------------------
+-- CRM DATA LOADING
+-- -----------------------------
+
+-- Load Customer Info
+TRUNCATE TABLE dwh_bronze.crm_cust_info;
+LOAD DATA LOCAL INFILE '<REPLACE_WITH_YOUR_PATH>/cust_info.csv'
+INTO TABLE dwh_bronze.crm_cust_info
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+-- Load Product Info
+TRUNCATE TABLE dwh_bronze.crm_prd_info;
+LOAD DATA LOCAL INFILE '<REPLACE_WITH_YOUR_PATH>/prd_info.csv'
+INTO TABLE dwh_bronze.crm_prd_info
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+-- Load Sales Details
+TRUNCATE TABLE dwh_bronze.crm_sales_details;
+LOAD DATA LOCAL INFILE '<REPLACE_WITH_YOUR_PATH>/sales_details.csv'
+INTO TABLE dwh_bronze.crm_sales_details
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+-- -----------------------------
+-- ERP DATA LOADING
+-- -----------------------------
+
+-- Load ERP Customer
+TRUNCATE TABLE dwh_bronze.erp_cust_az12;
+LOAD DATA LOCAL INFILE '<REPLACE_WITH_YOUR_PATH>/CUST_AZ12.csv'
+INTO TABLE dwh_bronze.erp_cust_az12
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+-- Load ERP Location
+TRUNCATE TABLE dwh_bronze.erp_loc_a101;
+LOAD DATA LOCAL INFILE '<REPLACE_WITH_YOUR_PATH>/LOC_A101.csv'
+INTO TABLE dwh_bronze.erp_loc_a101
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+-- Load ERP Category
+TRUNCATE TABLE dwh_bronze.erp_px_cat_g1v2;
+LOAD DATA LOCAL INFILE '<REPLACE_WITH_YOUR_PATH>/PX_CAT_G1V2.csv'
+INTO TABLE dwh_bronze.erp_px_cat_g1v2
+CHARACTER SET utf8mb4
+FIELDS TERMINATED BY ',' 
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\r\n'
+IGNORE 1 ROWS;
+
+-- 2. Cleanup Environment
+SET UNIQUE_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 1;
